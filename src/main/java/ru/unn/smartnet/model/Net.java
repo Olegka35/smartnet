@@ -1,8 +1,9 @@
 package ru.unn.smartnet.model;
 
 import ru.unn.smartnet.graph.Graph;
+import ru.unn.smartnet.graph.NetParam;
 
-import java.util.Date;
+import java.util.*;
 
 public class Net {
     private Integer id;
@@ -83,4 +84,75 @@ public class Net {
                 ", type=" + type +
                 '}';
     }
+
+    public Map<String, Object> convertToMap() {
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("id", id);
+        result.put("name", name);
+        result.put("userID", userID);
+        result.put("graph", convertGraphToMap());
+        result.put("date", date);
+        result.put("type", type);
+        return result;
+    }
+
+    private Map<String, Object> convertGraphToMap() {
+        Map<String, Object> graph = new HashMap<>();
+
+        List<Map<String, Object>> connections = new ArrayList<>();
+        List<Map<String, Object>> vertices = new ArrayList<>();
+        List<Map<String, Object>> params = new ArrayList<>();
+        Set<Integer> paramsIDs = new HashSet<>();
+
+        Set<Element> elements = this.graph.getAllVertices();
+        for(Element element: elements) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", element.getId());
+            List<NetParam> elementParams = element.getParams();
+            map.put("params", convertParamsToList(elementParams, params, paramsIDs));
+            vertices.add(map);
+
+            List<Element> connectedElements = this.graph.getAdjacentVertices(element);
+            for(Element e2: connectedElements) {
+                Map<String, Object> connection = new HashMap<>();
+                connection.put("from", element.getId());
+                connection.put("to", e2.getId());
+
+                List<NetParam> paramList = this.graph.getParams(element, e2);
+                connection.put("params", convertParamsToList(paramList, params, paramsIDs));
+                connections.add(connection);
+            }
+        }
+
+        graph.put("params", params);
+        graph.put("vertices", vertices);
+        graph.put("connections", connections);
+        return graph;
+    }
+
+    private List<Map<String, Object>> convertParamsToList(List<NetParam> netParamList, List<Map<String, Object>> params, Set<Integer> usedIDs) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for(NetParam param: netParamList) {
+            Integer paramID = param.getId();
+
+            if(!usedIDs.contains(paramID)) {
+                Map<String, Object> map = new HashMap<String, Object>() {{
+                    put("id", paramID);
+                    put("name", param.getName());
+                    put("type", param.getType());
+                }};
+                params.add(map);
+            }
+            usedIDs.add(paramID);
+
+            Map<String, Object> map = new HashMap<String, Object>() {{
+                put("id", paramID);
+                put("value", param.getValue());
+            }};
+            result.add(map);
+        }
+        return result;
+    }
+
 }

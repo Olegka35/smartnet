@@ -1,12 +1,16 @@
 package ru.unn.smartnet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ru.unn.smartnet.graph.NetParam;
 
 import java.util.ArrayList;
 
 public class Element {
     private Integer id;
+
+    @JsonIgnore
     private Integer netID;
+
     private ArrayList<NetParam> params;
 
     public Element(Integer id, Integer netID, ArrayList<NetParam> params) {

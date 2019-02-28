@@ -28,11 +28,11 @@ public class SmartnetApplication {
 		testGraph.addVertice(nn);
 		testGraph.addVertice(vologda);
 
-		testGraph.addDoubleEdge(nn, moscow, new ArrayList<NetParam>() {{ add(new NetParam(1, "Расстояние", 400, PARAM_TYPE.INTEGER_TYPE)); }});
-		testGraph.addDoubleEdge(spb, moscow, new ArrayList<NetParam>() {{ add(new NetParam(1, "Расстояние", 640, PARAM_TYPE.INTEGER_TYPE)); }});
-		testGraph.addDoubleEdge(vologda, moscow, new ArrayList<NetParam>() {{ add(new NetParam(1, "Расстояние", 410, PARAM_TYPE.INTEGER_TYPE)); }});
-		testGraph.addDoubleEdge(vologda, spb, new ArrayList<NetParam>() {{ add(new NetParam(1, "Расстояние", 550, PARAM_TYPE.INTEGER_TYPE)); }});
-		testGraph.addDoubleEdge(vologda, nn, new ArrayList<NetParam>() {{ add(new NetParam(1, "Расстояние", 405, PARAM_TYPE.INTEGER_TYPE)); }});
+		testGraph.addDoubleEdge(nn, moscow, new ArrayList<NetParam>() {{ add(new NetParam(2, "Расстояние", 400, PARAM_TYPE.INTEGER_TYPE)); }});
+		testGraph.addDoubleEdge(spb, moscow, new ArrayList<NetParam>() {{ add(new NetParam(2, "Расстояние", 640, PARAM_TYPE.INTEGER_TYPE)); }});
+		testGraph.addDoubleEdge(vologda, moscow, new ArrayList<NetParam>() {{ add(new NetParam(2, "Расстояние", 410, PARAM_TYPE.INTEGER_TYPE)); }});
+		testGraph.addDoubleEdge(vologda, spb, new ArrayList<NetParam>() {{ add(new NetParam(2, "Расстояние", 550, PARAM_TYPE.INTEGER_TYPE)); }});
+		testGraph.addDoubleEdge(vologda, nn, new ArrayList<NetParam>() {{ add(new NetParam(2, "Расстояние", 405, PARAM_TYPE.INTEGER_TYPE)); }});
 
 		Net net = new Net();
 		net.setId(11111);
