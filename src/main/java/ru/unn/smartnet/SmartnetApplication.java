@@ -7,6 +7,7 @@ import ru.unn.smartnet.graph.NetParam;
 import ru.unn.smartnet.graph.PARAM_TYPE;
 import ru.unn.smartnet.model.Element;
 import ru.unn.smartnet.model.Net;
+import ru.unn.smartnet.model.algorithms.Dijkstra;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +41,9 @@ public class SmartnetApplication {
 		net.setDate(new Date());
 		net.setGraph(testGraph);
 		net.setType(1);
-		System.out.println(net);
+
+		Dijkstra dijkstra = new Dijkstra(net, new NetParam(2, "Расстояние", 400, PARAM_TYPE.INTEGER_TYPE));
+		System.out.println(dijkstra.getShortestPath(spb, nn));
 	}
 
 }

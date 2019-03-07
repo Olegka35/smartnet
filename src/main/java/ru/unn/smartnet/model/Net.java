@@ -73,6 +73,15 @@ public class Net {
         this.type = type;
     }
 
+    public Element getElement(Integer id) {
+        Set<Element> elements = graph.getAllVertices();
+        for(Element element: elements) {
+            if(element.getId().equals(id))
+                return element;
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return "Net{" +

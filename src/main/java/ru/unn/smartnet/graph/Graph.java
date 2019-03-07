@@ -1,5 +1,7 @@
 package ru.unn.smartnet.graph;
 
+import ru.unn.smartnet.model.Net;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -148,6 +150,20 @@ public class Graph<V> implements Serializable {
             }
         }
         return params;
+    }
+
+    public Object getParameter(V src, V dest, NetParam requestParam) {
+        return getParameter(src, dest, requestParam.getId());
+    }
+
+    public Object getParameter(V src, V dest, Integer requestParamID) {
+        List<NetParam> paramList = getParams(src, dest);
+        for(NetParam netParam: paramList) {
+            if(netParam.getId().equals(requestParamID)) {
+                return netParam.getValue();
+            }
+        }
+        return null;
     }
 
     public List<V> getAdjacentVertices(V vertex) {
