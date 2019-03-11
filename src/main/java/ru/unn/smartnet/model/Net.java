@@ -130,6 +130,11 @@ public class Net {
 
                 List<NetParam> paramList = this.graph.getParams(element, e2);
                 connection.put("params", convertParamsToList(paramList, params, paramsIDs));
+
+                if(this.graph.hasRelationship(e2, element) && this.graph.getParams(e2, element).equals(paramList))
+                    connection.put("reverse", true);
+                else
+                    connection.put("reverse", false);
                 connections.add(connection);
             }
         }
