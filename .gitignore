@@ -23,3 +23,5 @@
 /nbdist/
 /.nb-gradle/
 /build/
+
+/src/main/java/ru/unn/smartnet/TestJava.java
