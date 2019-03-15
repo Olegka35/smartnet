@@ -1,6 +1,8 @@
 package ru.unn.smartnet.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.unn.smartnet.dao.NetDAO;
 import ru.unn.smartnet.graph.Graph;
 import ru.unn.smartnet.graph.NetParam;
 import ru.unn.smartnet.graph.PARAM_TYPE;
@@ -13,8 +15,17 @@ import java.util.List;
 
 @Service
 public class NetServiceImpl implements NetService {
+    @Autowired
+    private NetDAO netDAO;
+
     @Override
     public Net getNet(Integer id) {
+        Net net = netDAO.getNet(id);
+        return net;
+    }
+
+    @Override
+    public Net getNet2(Integer id) {
         Graph<Element> testGraph = new Graph<Element>();
         Element moscow = new Element(501, 11111, new ArrayList<NetParam>() {{ add(new NetParam(1, "Название", "Москва", PARAM_TYPE.STRING_TYPE)); }});
         Element spb = new Element(502, 11111, new ArrayList<NetParam>() {{ add(new NetParam(1, "Название", "Санкт-Петербург", PARAM_TYPE.STRING_TYPE)); }});
@@ -63,7 +74,7 @@ public class NetServiceImpl implements NetService {
 
     @Override
     public List<Net> getNetList() {
-        return null;
+        return netDAO.getNetList();
     }
 
     @Override

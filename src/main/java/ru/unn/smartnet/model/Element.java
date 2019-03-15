@@ -43,6 +43,10 @@ public class Element {
         this.params = params;
     }
 
+    public void addParam(NetParam param) {
+        this.params.add(param);
+    }
+
     @Override
     public String toString() {
         return "Element{" +

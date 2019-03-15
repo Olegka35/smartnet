@@ -20,14 +20,24 @@ public class NetController {
     @Autowired
     private NetService netService;
 
+    @RequestMapping(value = "/nets", method = RequestMethod.GET)
+    public ResponseEntity<List<Net>> getNetList() {
+        return new ResponseEntity<List<Net>>(netService.getNetList(), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/net/{id}", method = RequestMethod.GET)
     public ResponseEntity<Map> getNet(@PathVariable("id") Integer netID) {
-        return new ResponseEntity<Map>(netService.getNet(1).convertToMap(), HttpStatus.OK);
+        return new ResponseEntity<Map>(netService.getNet(netID).convertToMap(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/net2/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Map> getNet2(@PathVariable("id") Integer netID) {
+        return new ResponseEntity<Map>(netService.getNet2(1).convertToMap(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/dijkstra/{id}", method = RequestMethod.GET)
     public ResponseEntity<List> getShortestPathDijkstra(@PathVariable("id") Integer netID, @RequestParam("from") Integer from, @RequestParam("to") Integer to) {
-        Net net = netService.getNet(1);
+        Net net = netService.getNet(netID);
         Dijkstra dijkstra = new Dijkstra(net, new NetParam(2, "Расстояние", 400, PARAM_TYPE.INTEGER_TYPE));
         List<Element> path = dijkstra.getShortestPath(from, to);
         if(path == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);

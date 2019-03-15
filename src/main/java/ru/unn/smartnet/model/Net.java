@@ -107,6 +107,7 @@ public class Net {
     }
 
     private Map<String, Object> convertGraphToMap() {
+        if(this.graph == null) return null;
         Map<String, Object> graph = new HashMap<>();
 
         List<Map<String, Object>> connections = new ArrayList<>();
