@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.unn.smartnet.graph.NetParam;
 import ru.unn.smartnet.graph.PARAM_TYPE;
+import ru.unn.smartnet.model.AddNetObject;
 import ru.unn.smartnet.model.Element;
 import ru.unn.smartnet.model.Net;
 import ru.unn.smartnet.model.algorithms.Dijkstra;
@@ -44,4 +45,17 @@ public class NetController {
         return new ResponseEntity<List>(path, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/net/", method = RequestMethod.POST)
+    public ResponseEntity<Object> addNet(@RequestBody AddNetObject net) {
+        if(!net.validate())
+            return new ResponseEntity<Object>("Incorrect net data", HttpStatus.BAD_REQUEST);
+        netService.createNet(net);
+        return new ResponseEntity<Object>("Added", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/net/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> deleteNet(@PathVariable("id") Integer netID) {
+        netService.deleteNet(netID);
+        return new ResponseEntity<Object>("Net has been deleted", HttpStatus.OK);
+    }
 }

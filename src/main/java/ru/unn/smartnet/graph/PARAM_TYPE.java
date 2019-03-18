@@ -18,4 +18,16 @@ public enum PARAM_TYPE {
                 throw new RuntimeException("Unknown index:" + index);
         }
     }
+
+    public static Integer getParamIDByName(String attrName) {
+        switch (attrName) {
+            case "STRING_TYPE":
+                return 1;
+            case "INTEGER_TYPE":
+                return 2;
+            case "DOUBLE_TYPE":
+                return 3;
+        }
+        return -1;
+    }
 }

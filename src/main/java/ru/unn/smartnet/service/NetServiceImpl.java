@@ -6,6 +6,7 @@ import ru.unn.smartnet.dao.NetDAO;
 import ru.unn.smartnet.graph.Graph;
 import ru.unn.smartnet.graph.NetParam;
 import ru.unn.smartnet.graph.PARAM_TYPE;
+import ru.unn.smartnet.model.AddNetObject;
 import ru.unn.smartnet.model.Element;
 import ru.unn.smartnet.model.Net;
 
@@ -78,8 +79,8 @@ public class NetServiceImpl implements NetService {
     }
 
     @Override
-    public void createNet(Net net) {
-
+    public void createNet(AddNetObject net) {
+        netDAO.addNet(net);
     }
 
     @Override
@@ -89,6 +90,6 @@ public class NetServiceImpl implements NetService {
 
     @Override
     public void deleteNet(Integer netID) {
-
+        netDAO.deleteNet(netID);
     }
 }

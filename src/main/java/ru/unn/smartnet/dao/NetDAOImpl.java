@@ -2,17 +2,20 @@ package ru.unn.smartnet.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.unn.smartnet.dao.mappers.*;
 import ru.unn.smartnet.graph.Graph;
 import ru.unn.smartnet.graph.NetParam;
 import ru.unn.smartnet.graph.PARAM_TYPE;
+import ru.unn.smartnet.model.AddNetObject;
 import ru.unn.smartnet.model.Element;
 import ru.unn.smartnet.model.Net;
-import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -42,6 +45,7 @@ public class NetDAOImpl implements NetDAO {
         String SQL_GET_CONNECTIONS_PARAMS = "SELECT * FROM connections_params WHERE net_id = ?";
 
         Net net = jdbcTemplate.queryForObject(SQL_GET_NET_INFO, new Object[]{id}, new NetInfoMapper());
+        if(net == null) return null;
         List<Element> elements = jdbcTemplate.query(SQL_GET_ELEMENTS, new Object[]{id}, new ElementsMapper(id));
         List<Map<String, Object>> connections = jdbcTemplate.queryForList(SQL_GET_CONNECTIONS, id);
         List<Map<String, Object>> attributes = jdbcTemplate.queryForList(SQL_GET_ATTRIBUTES, id);
@@ -81,6 +85,109 @@ public class NetDAOImpl implements NetDAO {
         }
         net.setGraph(graph);
         return net;
+    }
+
+    @Override
+    public void addNet(AddNetObject net) {
+        String SQL_INSERT_NET = "INSERT INTO nets (type, date, name) VALUES (?, NOW(), ?)";
+        String SQL_INSERT_ATTR = "INSERT INTO attributes (type, name) VALUES (?, ?)";
+        String SQL_INSERT_ELEMENT = "INSERT INTO elements (net_id, element_id) VALUES (?, ?)";
+        String SQL_INSERT_CONNECTION = "INSERT INTO connections (net_id, from_element, to_element, reversed) VALUES (?, ?, ?, ?)";
+        String SQL_INSERT_ELEMENT_PARAM = "INSERT INTO element_params (net_id, element_id, attr_id, value) VALUES (?, ?, ?, ?)";
+        String SQL_INSERT_CONNECTION_PARAM = "INSERT INTO connections_params (net_id, \"from\", \"to\", attr_id, value) VALUES (?, ?, ?, ?, ?)";
+
+        KeyHolder holder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_NET, new String[] { "id" });
+                preparedStatement.setInt(1, net.getType());
+                preparedStatement.setString(2, net.getName());
+                return preparedStatement;
+            }
+        }, holder);
+        Integer netID = holder.getKey().intValue();
+        Map<Integer, Integer> attrIDsRelates = new HashMap<>();
+        List<Map<String, Object>> elementParams = net.getElementParams();
+        List<Map<String, Object>> connectionParams = net.getConnectionParams();
+
+        for(Map<String, Object> attr: net.getParams()) {
+            jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                    PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_ATTR, new String[] { "id" });
+                    preparedStatement.setInt(1, PARAM_TYPE.getParamIDByName((String)attr.get("type")));
+                    preparedStatement.setString(2, (String)attr.get("name"));
+                    return preparedStatement;
+                }
+            }, holder);
+            attrIDsRelates.put((Integer)attr.get("id"), holder.getKey().intValue());
+        }
+
+        jdbcTemplate.batchUpdate(SQL_INSERT_ELEMENT,
+        new BatchPreparedStatementSetter() {
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, netID);
+                ps.setInt(2, (Integer)net.getElements().get(i).get("id"));
+            }
+            public int getBatchSize() {
+                return net.getElements().size();
+            }
+        });
+        jdbcTemplate.batchUpdate(SQL_INSERT_CONNECTION,
+        new BatchPreparedStatementSetter() {
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, netID);
+                ps.setInt(2, (Integer)net.getConnections().get(i).get("from"));
+                ps.setInt(3, (Integer)net.getConnections().get(i).get("to"));
+                ps.setBoolean(4, (Boolean)net.getConnections().get(i).getOrDefault("reverse", false));
+            }
+            public int getBatchSize() {
+                return net.getConnections().size();
+            }
+        });
+        jdbcTemplate.batchUpdate(SQL_INSERT_ELEMENT_PARAM,
+        new BatchPreparedStatementSetter() {
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, netID);
+                ps.setInt(2, (Integer)elementParams.get(i).get("element_id"));
+                ps.setInt(3, attrIDsRelates.get((Integer)elementParams.get(i).get("id")));
+                ps.setString(4, (String)elementParams.get(i).get("value"));
+            }
+            public int getBatchSize() {
+                return elementParams.size();
+            }
+        });
+        jdbcTemplate.batchUpdate(SQL_INSERT_CONNECTION_PARAM,
+        new BatchPreparedStatementSetter() {
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setInt(1, netID);
+                ps.setInt(2, (Integer)connectionParams.get(i).get("from"));
+                ps.setInt(3, (Integer)connectionParams.get(i).get("to"));
+                ps.setInt(4, attrIDsRelates.get((Integer)connectionParams.get(i).get("id")));
+                ps.setString(5, (String)connectionParams.get(i).get("value"));
+            }
+            public int getBatchSize() {
+                return connectionParams.size();
+            }
+        });
+    }
+
+    @Override
+    public void deleteNet(Integer id) {
+        String SQL_DELETE_ATTR = "DELETE FROM attributes WHERE id IN (SELECT attr_id FROM element_params UNION SELECT attr_id FROM connections_params WHERE net_id = ?)";
+        String SQL_DELETE_ELEMENT_PARAMS = "DELETE FROM element_params WHERE net_id = ?";
+        String SQL_DELETE_CONN_PARAMS = "DELETE FROM connections_params WHERE net_id = ?";
+        String SQL_DELETE_ELEMENTS = "DELETE FROM elements WHERE net_id = ?";
+        String SQL_DELETE_CONNECTIONS = "DELETE FROM connections WHERE net_id = ?";
+        String SQL_DELETE_NET = "DELETE FROM nets WHERE id = ?";
+
+        jdbcTemplate.update(SQL_DELETE_ATTR, id);
+        jdbcTemplate.update(SQL_DELETE_ELEMENT_PARAMS, id);
+        jdbcTemplate.update(SQL_DELETE_CONN_PARAMS, id);
+        jdbcTemplate.update(SQL_DELETE_ELEMENTS, id);
+        jdbcTemplate.update(SQL_DELETE_CONNECTIONS, id);
+        jdbcTemplate.update(SQL_DELETE_NET, id);
     }
 
     private static Map<String, Object> getAttributeByID(List<Map<String, Object>> attributes, Integer id) {
