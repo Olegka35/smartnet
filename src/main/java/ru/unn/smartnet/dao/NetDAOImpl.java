@@ -40,7 +40,8 @@ public class NetDAOImpl implements NetDAO {
         String SQL_GET_NET_INFO = "SELECT * FROM nets WHERE id = ?";
         String SQL_GET_ELEMENTS = "SELECT * FROM elements WHERE net_id = ?";
         String SQL_GET_CONNECTIONS = "SELECT * FROM connections WHERE net_id = ?";
-        String SQL_GET_ATTRIBUTES = "SELECT * FROM attributes WHERE id IN (SELECT attr_id FROM element_params UNION SELECT attr_id FROM connections_params WHERE net_id = ?)";
+        String SQL_GET_ATTRIBUTES = "SELECT * FROM attributes WHERE id IN " +
+                "(SELECT attr_id FROM (SELECT attr_id, net_id FROM element_params UNION SELECT attr_id, net_id FROM connections_params) u WHERE u.net_id = ?)";
         String SQL_GET_ELEMENT_PARAMS = "SELECT * FROM element_params WHERE net_id = ?";
         String SQL_GET_CONNECTIONS_PARAMS = "SELECT * FROM connections_params WHERE net_id = ?";
 
@@ -175,7 +176,8 @@ public class NetDAOImpl implements NetDAO {
 
     @Override
     public void deleteNet(Integer id) {
-        String SQL_DELETE_ATTR = "DELETE FROM attributes WHERE id IN (SELECT attr_id FROM element_params UNION SELECT attr_id FROM connections_params WHERE net_id = ?)";
+        String SQL_DELETE_ATTR = "DELETE FROM attributes WHERE id IN " +
+                "(SELECT attr_id FROM (SELECT attr_id, net_id FROM element_params UNION SELECT attr_id, net_id FROM connections_params) u WHERE u.net_id = ?)";
         String SQL_DELETE_ELEMENT_PARAMS = "DELETE FROM element_params WHERE net_id = ?";
         String SQL_DELETE_CONN_PARAMS = "DELETE FROM connections_params WHERE net_id = ?";
         String SQL_DELETE_ELEMENTS = "DELETE FROM elements WHERE net_id = ?";
