@@ -21,14 +21,14 @@ public class Dijkstra {
         valueMap = new HashMap<>();
     }
 
-    public List<Element> getShortestPath(Integer id1, Integer id2) {
+    public Map<String, Object> getShortestPath(Integer id1, Integer id2) {
         Element e1 = net.getElement(id1);
         Element e2 = net.getElement(id2);
         if(e1 == null || e2 == null) return null;
         return getShortestPath(e1, e2);
     }
 
-    public List<Element> getShortestPath(Element e1, Element e2) {
+    public Map<String, Object> getShortestPath(Element e1, Element e2) {
         if (this.param.getType() == PARAM_TYPE.STRING_TYPE) return null;
         valueMap.clear();
         Map<Element, Element> previousElementMap = new HashMap<>();
@@ -43,14 +43,14 @@ public class Dijkstra {
             List<Element> connectedElements = graph.getAdjacentVertices(currentElement);
             for (Element element : connectedElements) {
                 if (fixedElements.contains(element)) continue;
-                Object currValue = valueMap.get(element);
+                Double currValue = valueMap.get(element);
 
                 if (currValue == null) {
                     valueMap.put(element, valueMap.get(currentElement) + Double.valueOf(graph.getParameter(currentElement, element, param).toString()));
                     previousElementMap.put(element, currentElement);
                 } else {
                     Double newValue = valueMap.get(currentElement) + Double.valueOf(graph.getParameter(currentElement, element, param).toString());
-                    if (newValue < (Double) currValue) {
+                    if (newValue < currValue) {
                         valueMap.put(element, newValue);
                         previousElementMap.put(element, currentElement);
                     }
@@ -65,7 +65,11 @@ public class Dijkstra {
             if(e.equals(e1)) break;
         }
         Collections.reverse(elements);
-        return elements;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("path", elements);
+        result.put("min_distance", valueMap.get(e2));
+        return result;
     }
 
     private Element findNextElement() {

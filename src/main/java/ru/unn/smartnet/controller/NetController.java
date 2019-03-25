@@ -40,7 +40,7 @@ public class NetController {
     public ResponseEntity<List> getShortestPathDijkstra(@PathVariable("id") Integer netID, @RequestParam("from") Integer from, @RequestParam("to") Integer to) {
         Net net = netService.getNet(netID);
         Dijkstra dijkstra = new Dijkstra(net, new NetParam(2, "Расстояние", 400, PARAM_TYPE.INTEGER_TYPE));
-        List<Element> path = dijkstra.getShortestPath(from, to);
+        List<Element> path = (List<Element>) dijkstra.getShortestPath(from, to).get("path");
         if(path == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<List>(path, HttpStatus.OK);
     }
