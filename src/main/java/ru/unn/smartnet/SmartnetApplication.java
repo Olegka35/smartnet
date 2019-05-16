@@ -68,7 +68,7 @@ public class SmartnetApplication {
 		Dijkstra dijkstra = new Dijkstra(net, new NetParam(2, "Расстояние", 400, PARAM_TYPE.INTEGER_TYPE));
 		System.out.println(dijkstra.getShortestPath(spb, nn));
 
-		List<Element> list = new ArrayList<>(Arrays.asList(moscow, perm, sochi));
+		List<Element> list = new ArrayList<>(Arrays.asList(moscow, perm, spb));
 		BranchAndBounds branchAndBounds = new BranchAndBounds(net, new NetParam(2, "Расстояние", 400, PARAM_TYPE.INTEGER_TYPE), list);
 		branchAndBounds.start();
 	}

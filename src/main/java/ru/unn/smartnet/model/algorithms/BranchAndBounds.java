@@ -11,8 +11,10 @@ import static java.lang.Double.MAX_VALUE;
 public class BranchAndBounds {
     private List<SubSet> setList;
     private Set<SubSet> notDivided;
+    private Map<Integer, Integer> resultPath;
 
     public BranchAndBounds(Net net, NetParam param, List<Element> elements) {
+        resultPath = new HashMap<Integer, Integer>();
         double[][] matrix = new double[elements.size()][elements.size()];
         for(int i = 0; i < elements.size(); i++) {
             for(int j = 0; j < elements.size(); j++) {
@@ -34,7 +36,7 @@ public class BranchAndBounds {
         notDivided.add(start);
     }
 
-    public void start() {
+    public Map<Integer, Integer> start() {
         while(true) {
             SubSet set = getMinEvalSet();
             notDivided.remove(set);
@@ -69,12 +71,19 @@ public class BranchAndBounds {
                 notDivided.addAll(Arrays.asList(set1, set2));
             }
             else {
-                System.out.println(set);
+                SubSet tempSet = set;
+                while(true) {
+                    Integer from = tempSet.rowIDs[(Integer)tempSet.firstStepResult.get("from")];
+                    Integer to = tempSet.fieldIDs[(Integer)tempSet.firstStepResult.get("to")];
+                    if(!resultPath.containsKey(from)) resultPath.put(from, to);
+                    if(tempSet.parent == null) break;
+                    tempSet = tempSet.parent;
+                }
+                System.out.println(resultPath);
                 break;
-                // ФИНАЛ
             }
         }
-        //return ;
+        return resultPath;
     }
 
     private class SubSet {
@@ -110,8 +119,10 @@ public class BranchAndBounds {
             for(int k = 0; k < set.size; k++)
                 set.matrix[k][j] -= fieldMin;
         }
-        if(type == 2)
+        if(type == 2) {
+            assert set.parent != null;
             set.evaluation = set.parent.evaluation + (Double)set.parent.firstStepResult.get("fine");
+        }
         set.firstStepResult = getMaxFire(set);
     }
 
