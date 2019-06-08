@@ -9,6 +9,7 @@ import ru.unn.smartnet.graph.PARAM_TYPE;
 import ru.unn.smartnet.model.AddNetObject;
 import ru.unn.smartnet.model.Element;
 import ru.unn.smartnet.model.Net;
+import ru.unn.smartnet.model.UpdateNetObject;
 import ru.unn.smartnet.model.algorithms.Dijkstra;
 import ru.unn.smartnet.service.NetService;
 
@@ -51,6 +52,12 @@ public class NetController {
             return new ResponseEntity<Object>("Incorrect net data", HttpStatus.BAD_REQUEST);
         netService.createNet(net);
         return new ResponseEntity<Object>("Added", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/net/{id}", method = RequestMethod.POST)
+    public ResponseEntity<Object> updateNet(@PathVariable("id") Integer netID, @RequestBody UpdateNetObject net) {
+        netService.updateNet(net);
+        return new ResponseEntity<Object>("Updated", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/net/{id}", method = RequestMethod.DELETE)

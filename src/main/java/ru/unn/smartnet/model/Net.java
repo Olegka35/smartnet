@@ -1,10 +1,14 @@
 package ru.unn.smartnet.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import ru.unn.smartnet.graph.Graph;
 import ru.unn.smartnet.graph.NetParam;
 
 import java.util.*;
 
+@Getter
+@Setter
 public class Net {
     private Integer id;
     private String name;
@@ -25,61 +29,43 @@ public class Net {
         this.type = type;
     }
 
-    public Integer getId() {
-        return id;
+    public Set<Element> getVertices() {
+        return graph.getAllVertices();
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Graph<Element> getGraph() {
-        return graph;
-    }
-
-    public void setGraph(Graph<Element> graph) {
-        this.graph = graph;
-    }
-
-    public Integer getUserID() {
-        return userID;
-    }
-
-    public void setUserID(Integer userID) {
-        this.userID = userID;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
+    public Set<Element> getAdjacentVertices(Element element) {
+        return this.graph.getAdjacentVertices(element);
     }
 
     public Element getElement(Integer id) {
-        Set<Element> elements = graph.getAllVertices();
+        Set<Element> elements = getVertices();
         for(Element element: elements) {
             if(element.getId().equals(id))
                 return element;
         }
         return null;
+    }
+
+    public void addConnection(Element el1, Element el2) {
+        addConnection(el1, el2, false);
+    }
+
+    public void addConnection(Element el1, Element el2, boolean reverse) {
+        if(reverse)
+            this.graph.addDoubleEdge(el1, el2);
+        else
+            this.graph.addEdge(el1, el2);
+    }
+
+    public void removeConnection(Element el1, Element el2) {
+        removeConnection(el1, el2, false);
+    }
+
+    public void removeConnection(Element el1, Element el2, boolean reverse) {
+        if(reverse)
+            this.graph.removeDoubleEdge(el1, el2);
+        else
+            this.graph.removeEdge(el1, el2);
     }
 
     @Override
@@ -115,7 +101,7 @@ public class Net {
         List<Map<String, Object>> params = new ArrayList<>();
         Set<Integer> paramsIDs = new HashSet<>();
 
-        Set<Element> elements = this.graph.getAllVertices();
+        Set<Element> elements = getVertices();
         for(Element element: elements) {
             Map<String, Object> map = new HashMap<>();
             map.put("id", element.getId());
@@ -123,7 +109,7 @@ public class Net {
             map.put("params", convertParamsToList(elementParams, params, paramsIDs));
             vertices.add(map);
 
-            List<Element> connectedElements = this.graph.getAdjacentVertices(element);
+            Set<Element> connectedElements = getAdjacentVertices(element);
             for(Element e2: connectedElements) {
                 Map<String, Object> connection = new HashMap<>();
                 connection.put("from", element.getId());

@@ -166,9 +166,9 @@ public class Graph<V> implements Serializable {
         return null;
     }
 
-    public List<V> getAdjacentVertices(V vertex) {
+    public Set<V> getAdjacentVertices(V vertex) {
         List<Node<V>> adjacentNodes = this.adjacencyList.get(vertex);
-        List<V> neighborVertex = new ArrayList<>();
+        Set<V> neighborVertex = new HashSet<>();
 
         if ((adjacentNodes != null) && !adjacentNodes.isEmpty()) {
             for (Node<V> v : adjacentNodes) {

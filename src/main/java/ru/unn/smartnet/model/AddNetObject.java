@@ -1,53 +1,18 @@
 package ru.unn.smartnet.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.*;
 
+@Getter
+@Setter
 public class AddNetObject {
     private String name;
     private Integer type;
     private List<Map<String, Object>> params;
     private List<Map<String, Object>> elements;
     private List<Map<String, Object>> connections;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public List<Map<String, Object>> getParams() {
-        return params;
-    }
-
-    public void setParams(List<Map<String, Object>> params) {
-        this.params = params;
-    }
-
-    public List<Map<String, Object>> getElements() {
-        return elements;
-    }
-
-    public void setElements(List<Map<String, Object>> elements) {
-        this.elements = elements;
-    }
-
-    public List<Map<String, Object>> getConnections() {
-        return connections;
-    }
-
-    public void setConnections(List<Map<String, Object>> connections) {
-        this.connections = connections;
-    }
 
     public List<Map<String, Object>> getElementParams() {
         List<Map<String, Object>> list = new ArrayList<>();

@@ -1,41 +1,18 @@
 $(document).ready(function() {
-   $.getJSON("/nets", function(result) {
+   $.getJSON("/net/1", function(result) {
         console.log(result);
-        for(let i = 0; i < result.length; i++) {
-            let id = 'net'+result[i].id;
-            $("#networks").append("<p id = " + id + " class = 'network_row'>" + parseInt(parseInt(i)+1) + ". " + result[i].name + "</p>");
-            $('#'+id).click(function() { displayNet(result[i].id); });
-        }
-   });
-});
-
-function displayNet(netID) {
-    $('#netboard').html();
-    getNetFromService(netID);
-}
-
-function getNetFromService(netID) {
-    $.getJSON("/net/"+netID, function(result) {
-        $('#elements').empty();
-        $('#attr').empty();
-
         var elements = result.graph.vertices, connections = result.graph.connections;
         var data = [], edges = [];
         elements.forEach(function(element, i) {
             //data.push({id: element.id, label: element.id.toString()});
             var params = element.params;
-            //var index = findIndexByElementId(params, 1);
-            var index = 0;
-            var elementName = params[index].value.toString();
-            data.push({id: element.id, label: elementName });
-            $('#elements').append("<input type='checkbox' />" + elementName + "<br/>");
+            var index = findIndexByElementId(params, 1);
+            data.push({id: element.id, label: params[index].value.toString()});
         });
         connections.forEach(function(edge, i) {
             var title = "";
             edge.params.forEach(function(param, j) {
-                var paramName = getParamName(result.graph.params, param.id);
-                title = title.concat(paramName + ": " + param.value + "; ");
-                $('#attr').append("<option>" + paramName + "</option>");
+                title = title.concat(getParamName(result.graph.params, param.id) + ": " + param.value + "; ");
             });
             if(edge.reverse == true) {
                 if(findEdge(edges, edge.from, edge.to) == false)
@@ -46,7 +23,7 @@ function getNetFromService(netID) {
         });
         var nodes = new vis.DataSet(data);
         var edges = new vis.DataSet(edges);
-        var container = document.getElementById('netboard');
+        var container = document.getElementById('mynetwork');
 
         var data = {
             nodes: nodes,
@@ -54,8 +31,8 @@ function getNetFromService(netID) {
         };
         var options = {};
         var network = new vis.Network(container, data, options);
-    });
-}
+   });
+});
 
 function findIndexByElementId(arr, id) {
     for(let i = 0; i < arr.length; ++i) {

@@ -1,11 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset = "ISO-8859-1" />
     <link href = "css/styles.css" rel = "stylesheet"/>
-    <title>Spring Boot Application</title>
+    <title>Smartnet</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="js/index.js"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+        #netboard {
+            width: 700px;
+            height: 500px;
+            border: 1px solid lightgray;
+        }
+    </style>
 </head>
 <body>
-<h4>Welcome to Thymeleaf Spring Boot web application</h4>
+<h4>Smartnet service</h4>
+<table>
+    <tr>
+        <td width="20%" valign="top">
+            <div id="networks"></div>
+        </td>
+        <td>
+            <div id="netboard"></div>
+        </td>
+        <td width="5%">
+        </td>
+        <td  valign="top">
+            <label>Выберите операцию</label><br/>
+            <select id="operation">
+                <option>Кратчайший путь</option>
+                <option>Самый длинный путь</option>
+                <option>Минимаксный путь</option>
+                <option>Максминный путь</option>
+                <option>Минимальное остовное дерево</option>
+                <option>Максимальное остовное дерево</option>
+            </select>
+
+            <br/><br/><label>Выберите параметр</label><br/>
+            <select id="attr">
+
+            </select>
+
+            <br/><br/><label>Выберите узлы</label><br/>
+            <div id="elements" style="width:200px; height:100px; overflow:auto; border:solid 1px #C3E4FE;">
+                <input type="checkbox" />Toyota<br/>
+                <input type="checkbox" />Mercedes-Benz<br/>
+                <input type="checkbox" />Toyota<br/>
+                <input type="checkbox" />Mercedes-Benz<br/>
+                <input type="checkbox" />Toyota<br/>
+                <input type="checkbox" />Mercedes-Benz<br/>
+                <input type="checkbox" />Toyota<br/>
+                <input type="checkbox" />Mercedes-Benz<br/>
+                <input type="checkbox" />Toyota<br/>
+                <input type="checkbox" />Mercedes-Benz<br/>
+                <input type="checkbox" />Toyota<br/>
+                <input type="checkbox" />Mercedes-Benz<br/>
+                <input type="checkbox" />Toyota<br/>
+                <input type="checkbox" />Mercedes-Benz<br/>
+                <input type="checkbox" />Toyota<br/>
+                <input type="checkbox" />Mercedes-Benz<br/>
+            </div>
+            <br/>
+            <button>Выполнить</button>
+            <br/>
+            <p><b>Output:</b></p>
+            <p>1. Мурманск</p>
+            <p>2. Вологда</p>
+            <p>3. Москва</p>
+            <p>4. Сочи</p>
+            <p><b>Result:</b> 2930</p>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

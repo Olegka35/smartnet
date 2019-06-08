@@ -40,7 +40,7 @@ public class Dijkstra {
         valueMap.put(e1, 0.0);
         previousElementMap.put(e1, null);
         while (!currentElement.equals(e2)) {
-            List<Element> connectedElements = graph.getAdjacentVertices(currentElement);
+            Set<Element> connectedElements = graph.getAdjacentVertices(currentElement);
             for (Element element : connectedElements) {
                 if (fixedElements.contains(element)) continue;
                 Double currValue = valueMap.get(element);

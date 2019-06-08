@@ -13,6 +13,7 @@ import ru.unn.smartnet.graph.PARAM_TYPE;
 import ru.unn.smartnet.model.AddNetObject;
 import ru.unn.smartnet.model.Element;
 import ru.unn.smartnet.model.Net;
+import ru.unn.smartnet.model.UpdateNetObject;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -190,6 +191,93 @@ public class NetDAOImpl implements NetDAO {
         jdbcTemplate.update(SQL_DELETE_ELEMENTS, id);
         jdbcTemplate.update(SQL_DELETE_CONNECTIONS, id);
         jdbcTemplate.update(SQL_DELETE_NET, id);
+    }
+
+    @Override
+    public void setNetName(Integer id, String newName) {
+        String SQL_UPDATE_NAME = "UPDATE nets SET name = ? WHERE id = ?";
+        jdbcTemplate.update(SQL_UPDATE_NAME, newName, id);
+    }
+
+    @Override
+    public void setNetType(Integer id, Integer newType) {
+        String SQL_UPDATE_NAME = "UPDATE nets SET type = ? WHERE id = ?";
+        jdbcTemplate.update(SQL_UPDATE_NAME, newType, id);
+    }
+
+    @Override
+    public void updateNetData(Integer id, UpdateNetObject data) {
+        String SQL_INSERT_ELEMENT = "INSERT INTO elements (net_id, element_id) VALUES (?, ?)";
+        String SQL_INSERT_CONNECTION = "INSERT INTO connections (net_id, from_element, to_element, reversed) VALUES (?, ?, ?, ?)";
+        String SQL_INSERT_ELEMENT_PARAM = "INSERT INTO element_params (net_id, element_id, attr_id, value) VALUES (?, ?, ?, ?)";
+        String SQL_INSERT_CONNECTION_PARAM = "INSERT INTO connections_params (net_id, \"from\", \"to\", attr_id, value) VALUES (?, ?, ?, ?, ?)";
+
+        String SQL_DELETE_VERTICE = "DELETE FROM elements WHERE net_id = ? AND element_id = ?";
+        String SQL_DELETE_CONNECTION = "DELETE FROM connections WHERE net_id = ? AND from_element = ? AND to_element = ?";
+        String SQL_DELETE_CONNECTION_PARAMS = "DELETE FROM connections_params WHERE net_id = ? AND from_element = ? AND to_element = ?";
+
+        List<Map<String, Object>> elementParams = data.getElementParams();
+        List<Map<String, Object>> connectionParams = data.getConnectionParams();
+
+        for(UpdateNetObject.Connection removedConnection: data.getRemoveConnections()) {
+            jdbcTemplate.update(SQL_DELETE_CONNECTION_PARAMS, id, removedConnection.getFrom(), removedConnection.getTo());
+            jdbcTemplate.update(SQL_DELETE_CONNECTION, id, removedConnection.getFrom(), removedConnection.getTo());
+            if(removedConnection.getReverse()) {
+                jdbcTemplate.update(SQL_DELETE_CONNECTION_PARAMS, id, removedConnection.getTo(), removedConnection.getFrom());
+                jdbcTemplate.update(SQL_DELETE_CONNECTION, id, removedConnection.getTo(), removedConnection.getFrom());
+            }
+        }
+        for(Integer elementID: data.getRemoveVerticesIDs()) {
+            jdbcTemplate.update(SQL_DELETE_VERTICE, id, elementID);
+        }
+
+        jdbcTemplate.batchUpdate(SQL_INSERT_ELEMENT,
+                new BatchPreparedStatementSetter() {
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, id);
+                        ps.setInt(2, data.getAddVertices().get(i).getId());
+                    }
+                    public int getBatchSize() {
+                        return data.getAddVertices().size();
+                    }
+                });
+        jdbcTemplate.batchUpdate(SQL_INSERT_CONNECTION,
+                new BatchPreparedStatementSetter() {
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, id);
+                        ps.setInt(2, data.getAddConnections().get(i).getFrom());
+                        ps.setInt(3, data.getAddConnections().get(i).getTo());
+                        ps.setBoolean(4, data.getAddConnections().get(i).getReverse());
+                    }
+                    public int getBatchSize() {
+                        return data.getAddConnections().size();
+                    }
+                });
+        jdbcTemplate.batchUpdate(SQL_INSERT_ELEMENT_PARAM,
+                new BatchPreparedStatementSetter() {
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, id);
+                        ps.setInt(2, (Integer)elementParams.get(i).get("element_id"));
+                        ps.setInt(3, (Integer)elementParams.get(i).get("id"));
+                        ps.setString(4, (String)elementParams.get(i).get("value"));
+                    }
+                    public int getBatchSize() {
+                        return elementParams.size();
+                    }
+                });
+        jdbcTemplate.batchUpdate(SQL_INSERT_CONNECTION_PARAM,
+                new BatchPreparedStatementSetter() {
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, id);
+                        ps.setInt(2, (Integer)connectionParams.get(i).get("from"));
+                        ps.setInt(3, (Integer)connectionParams.get(i).get("to"));
+                        ps.setInt(4, (Integer)connectionParams.get(i).get("id"));
+                        ps.setString(5, (String)connectionParams.get(i).get("value"));
+                    }
+                    public int getBatchSize() {
+                        return connectionParams.size();
+                    }
+                });
     }
 
     private static Map<String, Object> getAttributeByID(List<Map<String, Object>> attributes, Integer id) {

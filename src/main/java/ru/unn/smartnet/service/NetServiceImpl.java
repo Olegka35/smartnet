@@ -9,6 +9,7 @@ import ru.unn.smartnet.graph.PARAM_TYPE;
 import ru.unn.smartnet.model.AddNetObject;
 import ru.unn.smartnet.model.Element;
 import ru.unn.smartnet.model.Net;
+import ru.unn.smartnet.model.UpdateNetObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,8 +85,20 @@ public class NetServiceImpl implements NetService {
     }
 
     @Override
-    public void updateNet(Net net) {
+    public void updateNet(UpdateNetObject updates) {
+        Net net = netDAO.getNet(updates.getId());
+        if(!updates.validate(net)) {
+            // Бросить ошибку
+        }
+        if(updates.getName() != null) {
 
+        }
+        if(updates.getType() != null) {
+
+        }
+        if(updates.getElements() != null || updates.getConnections() != null) {
+
+        }
     }
 
     @Override
@@ -93,3 +106,21 @@ public class NetServiceImpl implements NetService {
         netDAO.deleteNet(netID);
     }
 }
+
+/*
+   elements: {
+        add: {
+            "id": 1,
+			"params": [
+				{
+					"id": 1,
+					"value": "Москва"
+				}
+			]
+        }
+        remove: {
+            id: []
+        }
+
+   }
+ */
