@@ -1,7 +1,6 @@
 package ru.unn.smartnet.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,7 +16,6 @@ import ru.unn.smartnet.model.UpdateNetObject;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -214,12 +212,12 @@ public class NetDAOImpl implements NetDAO {
 
         String SQL_DELETE_VERTICE = "DELETE FROM elements WHERE net_id = ? AND element_id = ?";
         String SQL_DELETE_CONNECTION = "DELETE FROM connections WHERE net_id = ? AND from_element = ? AND to_element = ?";
-        String SQL_DELETE_CONNECTION_PARAMS = "DELETE FROM connections_params WHERE net_id = ? AND from_element = ? AND to_element = ?";
+        String SQL_DELETE_CONNECTION_PARAMS = "DELETE FROM connections_params WHERE net_id = ? AND \"from\" = ? AND \"to\" = ?";
 
         List<Map<String, Object>> elementParams = data.getElementParams();
         List<Map<String, Object>> connectionParams = data.getConnectionParams();
 
-        for(UpdateNetObject.Connection removedConnection: data.getRemoveConnections()) {
+        for(ru.unn.smartnet.model.Connection removedConnection: data.getRemoveConnections()) {
             jdbcTemplate.update(SQL_DELETE_CONNECTION_PARAMS, id, removedConnection.getFrom(), removedConnection.getTo());
             jdbcTemplate.update(SQL_DELETE_CONNECTION, id, removedConnection.getFrom(), removedConnection.getTo());
             if(removedConnection.getReverse()) {

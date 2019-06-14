@@ -54,8 +54,9 @@ public class NetController {
         return new ResponseEntity<Object>("Added", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/net/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/net/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Object> updateNet(@PathVariable("id") Integer netID, @RequestBody UpdateNetObject net) {
+        net.setId(netID);
         netService.updateNet(net);
         return new ResponseEntity<Object>("Updated", HttpStatus.OK);
     }

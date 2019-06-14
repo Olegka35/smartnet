@@ -89,15 +89,17 @@ public class NetServiceImpl implements NetService {
         Net net = netDAO.getNet(updates.getId());
         if(!updates.validate(net)) {
             // Бросить ошибку
+            return;
         }
+        Integer netID = net.getId();
         if(updates.getName() != null) {
-
+            netDAO.setNetName(netID, updates.getName());
         }
         if(updates.getType() != null) {
-
+            netDAO.setNetType(netID, updates.getType());
         }
         if(updates.getElements() != null || updates.getConnections() != null) {
-
+            netDAO.updateNetData(netID, updates);
         }
     }
 

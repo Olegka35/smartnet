@@ -1,12 +1,12 @@
 package ru.unn.smartnet.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.*;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddNetObject {
     private String name;
     private Integer type;
@@ -95,16 +95,5 @@ public class AddNetObject {
         catch (Exception e) {
             return false;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "AddNetObject{" +
-                "name='" + name + '\'' +
-                ", type=" + type +
-                ", params=" + params +
-                ", elements=" + elements +
-                ", connections=" + connections +
-                '}';
     }
 }

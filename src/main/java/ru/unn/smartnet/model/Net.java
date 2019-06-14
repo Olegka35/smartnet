@@ -1,14 +1,14 @@
 package ru.unn.smartnet.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.unn.smartnet.graph.Graph;
 import ru.unn.smartnet.graph.NetParam;
 
 import java.util.*;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Net {
     private Integer id;
     private String name;
@@ -17,28 +17,18 @@ public class Net {
     private Date date;
     private Integer type;
 
-    public Net() {
-    }
-
-    public Net(Integer id, String name, Graph<Element> graph, Integer userID, Date date, Integer type) {
-        this.id = id;
-        this.name = name;
-        this.graph = graph;
-        this.userID = userID;
-        this.date = date;
-        this.type = type;
-    }
-
-    public Set<Element> getVertices() {
+    public Set<Element> findAllVertices() {
+        if(graph == null) return null;
         return graph.getAllVertices();
     }
 
-    public Set<Element> getAdjacentVertices(Element element) {
+    public Set<Element> findAdjacentVertices(Element element) {
+        if(graph == null) return null;
         return this.graph.getAdjacentVertices(element);
     }
 
     public Element getElement(Integer id) {
-        Set<Element> elements = getVertices();
+        Set<Element> elements = findAllVertices();
         for(Element element: elements) {
             if(element.getId().equals(id))
                 return element;
@@ -68,18 +58,6 @@ public class Net {
             this.graph.removeEdge(el1, el2);
     }
 
-    @Override
-    public String toString() {
-        return "Net{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", graph=" + graph +
-                ", userID=" + userID +
-                ", date=" + date +
-                ", type=" + type +
-                '}';
-    }
-
     public Map<String, Object> convertToMap() {
         Map<String, Object> result = new HashMap<>();
 
@@ -101,7 +79,7 @@ public class Net {
         List<Map<String, Object>> params = new ArrayList<>();
         Set<Integer> paramsIDs = new HashSet<>();
 
-        Set<Element> elements = getVertices();
+        Set<Element> elements = findAllVertices();
         for(Element element: elements) {
             Map<String, Object> map = new HashMap<>();
             map.put("id", element.getId());
@@ -109,7 +87,7 @@ public class Net {
             map.put("params", convertParamsToList(elementParams, params, paramsIDs));
             vertices.add(map);
 
-            Set<Element> connectedElements = getAdjacentVertices(element);
+            Set<Element> connectedElements = findAdjacentVertices(element);
             for(Element e2: connectedElements) {
                 Map<String, Object> connection = new HashMap<>();
                 connection.put("from", element.getId());
